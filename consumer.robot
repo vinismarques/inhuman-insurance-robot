@@ -2,7 +2,7 @@
 Documentation       Inhuman Insurance, Inc. Artificial Intelligence System robot.
 ...                 Consumes traffic data work items.
 
-Resource            shared.robot
+Resource            shared.resource
 
 
 *** Tasks ***
@@ -12,42 +12,42 @@ Consume traffic data work items
 
 
 *** Keywords ***
-Process traffic data
+Process Traffic Data
     ${payload}=    Get Work Item Payload
     ${traffic_data}=    Set Variable    ${payload}[${WORK_ITEM_NAME}]
-    ${valid}=    Validate traffic data    ${traffic_data}
+    ${valid}=    Validate Traffic Data    ${traffic_data}
     IF    ${valid}
-        Post traffic data to sales system    ${traffic_data}
+        Post Traffic Data To Sales System    ${traffic_data}
     ELSE
-        Handle invalid traffic data    ${traffic_data}
+        Handle Invalid Traffic Data    ${traffic_data}
     END
 
-Validate traffic data
+Validate Traffic Data
     [Arguments]    ${traffic_data}
     ${country}=    Get value from JSON    ${traffic_data}    $.country
     ${valid}=    Evaluate    len("${country}") == 3
     RETURN    ${valid}
 
-Post traffic data to sales system
+Post Traffic Data To Sales System
     [Arguments]    ${traffic_data}
     ${status}    ${return}=    Run Keyword And Ignore Error
     ...    POST
     ...    https://robocorp.com/inhuman-insurance-inc/sales-system-api
     ...    json=${traffic_data}
-    Handle traffic API response    ${status}    ${return}    ${traffic_data}
+    Handle Traffic API Response    ${status}    ${return}    ${traffic_data}
 
-Handle traffic API response
+Handle Traffic API Response
     [Arguments]    ${status}    ${return}    ${traffic_data}
     IF    "${status}" == "PASS"
-        Handle traffic API OK response
+        Handle Traffic API OK Response
     ELSE
-        Handle traffic API error response    ${return}    ${traffic_data}
+        Handle Traffic API Error Response    ${return}    ${traffic_data}
     END
 
-Handle traffic API OK response
+Handle Traffic API OK Response
     Release Input Work Item    DONE
 
-Handle traffic API error response
+Handle Traffic API Error Response
     [Arguments]    ${return}    ${traffic_data}
     Log
     ...    Traffic data posting failed: ${traffic_data} ${return}
@@ -58,7 +58,7 @@ Handle traffic API error response
     ...    code=TRAFFIC_DATA_POST_FAILED
     ...    message=${return}
 
-Handle invalid traffic data
+Handle Invalid Traffic Data
     [Arguments]    ${traffic_data}
     ${message}=    Set Variable    Invalid traffic data: ${traffic_data}
     Log    ${message}    WARN

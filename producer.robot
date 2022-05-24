@@ -2,9 +2,9 @@
 Documentation       Inhuman Insurance, Inc. Artificial Intelligence System robot.
 ...                 Produces traffic data work items.
 
-Library             RPA.Tables
 Library             Collections
-Resource            shared.robot
+Library             RPA.Tables
+Resource            shared.resource
 
 
 *** Variables ***
@@ -18,27 +18,27 @@ ${YEAR_KEY}=                    TimeDim
 
 *** Tasks ***
 Produce traffic data work items
-    Download traffic data
-    ${traffic_data}=    Load traffic data as table
-    ${filtered_data}=    Filter and sort traffic data    ${traffic_data}
-    ${filtered_data}=    Get latest data by country    ${filtered_data}
-    ${payloads}=    Create work item payloads    ${filtered_data}
-    Save work item payloads    ${payloads}
+    Download Traffic Data
+    ${traffic_data}=    Load Traffic Data As Table
+    ${filtered_data}=    Filter And Sort Traffic Data    ${traffic_data}
+    ${filtered_data}=    Get Latest Data By Country    ${filtered_data}
+    ${payloads}=    Create Work Item Payloads    ${filtered_data}
+    Save Work Item Payloads    ${payloads}
 
 
 *** Keywords ***
-Download traffic data
+Download Traffic Data
     Download
     ...    https://github.com/robocorp/inhuman-insurance-inc/raw/main/RS_198.json
     ...    ${TRAFFIC_JSON_FILE_PATH}
     ...    overwrite=True
 
-Load traffic data as table
+Load Traffic Data As Table
     ${json}=    Load JSON from file    ${TRAFFIC_JSON_FILE_PATH}
     ${table}=    Create Table    ${json}[value]
     RETURN    ${table}
 
-Filter and sort traffic data
+Filter And Sort Traffic Data
     [Arguments]    ${table}
     ${max_rate}=    Set Variable    ${5.0}
     ${both_genders}=    Set Variable    BTSX
@@ -47,7 +47,7 @@ Filter and sort traffic data
     Sort Table By Column    ${table}    ${YEAR_KEY}    ascending=False
     RETURN    ${table}
 
-Get latest data by country
+Get Latest Data By Country
     [Arguments]    ${table}
     @{groups}=    Group Table By Column    ${table}    ${COUNTRY_KEY}
     ${latest_data_by_country}=    Create List
@@ -57,7 +57,7 @@ Get latest data by country
     END
     RETURN    ${latest_data_by_country}
 
-Create work item payloads
+Create Work Item Payloads
     [Arguments]    ${traffic_data}
     ${payloads}=    Create List
     FOR    ${row}    IN    @{traffic_data}
@@ -69,13 +69,13 @@ Create work item payloads
     END
     RETURN    ${payloads}
 
-Save work item payloads
+Save Work Item Payloads
     [Arguments]    ${payloads}
     FOR    ${payload}    IN    @{payloads}
-        Save work item payload    ${payload}
+        Save Work Item Payload    ${payload}
     END
 
-Save work item payload
+Save Work Item Payload
     [Arguments]    ${payload}
     ${variables}=    Create Dictionary    ${WORK_ITEM_NAME}=${payload}
     Create Output Work Item    variables=${variables}    save=True

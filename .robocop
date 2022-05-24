@@ -1,0 +1,3 @@
+--exclude missing-doc-keyword
+--exclude missing-doc-test-case
+--exclude missing-doc-suite
